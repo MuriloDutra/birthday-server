@@ -1,18 +1,19 @@
-const hostname = '127.0.0.1'
-const port = 3000
-
-var express = require('express')
-const bodyParser = require('body-parser');
-const routes = require('./routes/photos.route')
+const express = require('express')
 var cors = require('cors')
-var app = express()
 
-app.use(routes)
+//const bodyParser = require('body-parser');
+//app.use(bodyParser.urlencoded({limit: '100mb'}))
+//app.use(bodyParser.json({limit: '100mb'}))
+const routes = require('./routes/photos.route')
+
+const app = express()
+
 app.use(cors())
-app.use(bodyParser.urlencoded({limit: '100mb'}))
-app.use(bodyParser.json({limit: '100mb'}))
+app.use(express.json())
+app.use(routes)
+
 
 //START SERVER
-app.listen(port, () => {
-    console.log(`Server running at http://${hostname}:${port}`)
+app.listen(4000, () => {
+    console.log(`Server running at http://localhost:4000`)
 })
