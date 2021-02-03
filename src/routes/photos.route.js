@@ -1,12 +1,22 @@
-var express = require('express')
-var router = express.Router()
+const express = require('express')
+const router = express.Router()
+const database = require('../database/connection')
+const PhotosController = require('../controllers/PhotosController')
 
-router.get('/getPhotos', (req, res) => {
-    res.send('Hello')
+router.get('/', (req, res) => {
+    res.send('Birthday server running and ready to go!')
 })
 
-router.post('/sendPhotos', (req, res) => {
-    res.sendStatus(200)('POST request to the homepage');
-});
+router.get('/getApprovedPhotos', PhotosController.getApprovedPhotos)
+
+router.get('/getPhotos', PhotosController.getPhotos)
+
+router.get('/getPhotoById/:id', PhotosController.getPhotoById)
+
+router.post('/sendPhotos', PhotosController.newPhotos);
+
+router.put('/updatePhoto/:id', PhotosController.updatePhoto)
+
+router.delete('/deletePhoto/:id', PhotosController.deletePhoto)
 
 module.exports = router
