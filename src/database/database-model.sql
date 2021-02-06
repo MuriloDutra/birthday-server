@@ -19,5 +19,4 @@ CREATE TABLE user (
 );
 
 SELECT * FROM birthdayCamila.user;
-
-INSERT INTO birthdayCamila.user (email, accountPassword) values ('TESTE', 'senhaTest')
+SELECT * FROM birthdayCamila.photos;
