@@ -1,6 +1,5 @@
 const express = require('express')
 const router = express.Router()
-const database = require('../database/connection')
 const PhotosController = require('../controllers/PhotosController')
 
 router.get('/', (req, res) => {

@@ -1,24 +1,25 @@
-const database = require('../database/connection')
+const databaseConnection = require('../database/connection')
+const base64Img = require('base64-img')
 
 
 class PhotosController{
     //GETTERS
     getPhotos(request, response){
-        database.select('*').table('photos')
+        databaseConnection.select('*').table('photos')
             .then(photos => response.json(photos))
             .catch(error => console.log('ERROR: ', error))
     }
 
 
     getApprovedPhotos(request, response){
-        database.select('*').table('photos').where({approved: 1})
+        databaseConnection.select('*').table('photos').where({approved: 1})
             .then(photos => response.json(photos))
             .catch(error => console.log('ERROR: ', error))
     }
 
 
     getUnapprovedPhotos(request, response){
-        database.select('*').table('photos').where({approved: 0})
+        databaseConnection.select('*').table('photos').where({approved: 0})
             .then(photos => response.json(photos))
             .catch(error => console.log('ERROR: ', error))
     }
@@ -27,26 +28,39 @@ class PhotosController{
     getPhotoById(request, response){
         const { id } = request.params
 
-        database.select('*').table('photos').where({id: id})
+        databaseConnection.select('*').table('photos').where({id: id})
             .then(photo => response.json(photo))
             .catch(error => console.log('ERROR: ', error))
     }
 
 
     getHighlightPhotos(request, response){
-        database.select('*').table('photos').where({highlightImage: 1})
+        databaseConnection.select('*').table('photos').where({highlightImage: 1})
             .then(photos => response.json(photos))
             .catch(error => console.log('ERROR: ', error))
     }
 
 
     //POST
-    newPhotos(request, response){
-        const { imageUrl, englishDescription, portugueseDescription, photoType, approved, highlightImage } = request.body
+    async newPhotos(request, response){
+        try{
+            const { imageUrl, englishDescription, portugueseDescription, photoType, approved, highlightImage } = request.body
+            
+            base64Img.img(imageUrl, 'public', Date.now(), (err, filepath) => {
+                const pathArr = filepath.split('/')
+                const fileName = pathArr[pathArr.length - 1]
 
-        database.insert({imageUrl, englishDescription, portugueseDescription, photoType, approved, highlightImage}).table('photos')
-            .then(data => response.json({message: 'Foto enviada com sucesso!'}))
-            .catch(error => console.log('ERROR: ', error))
+                response.send({
+                    success: true,
+                    url: `htpp://127.0.0.1:4000/${fileName}`
+                })
+            })
+            /*databaseConnection.insert({imageUrl, englishDescription, portugueseDescription, photoType, approved, highlightImage}).table('photos')
+                .then(data => response.json({message: 'Foto enviada com sucesso!'}))
+                .catch(error => console.log('ERROR: ', error))*/
+        }catch(error){
+            console.log(error)
+        }
     }
 
 
@@ -55,7 +69,7 @@ class PhotosController{
         const { id } = request.params
         const { imageUrl, englishDescription, portugueseDescription, photoType, approved, highlightImage } = request.body
 
-        database.where({id: id}).update({imageUrl, englishDescription, portugueseDescription, photoType, approved, highlightImage}).table('photos')
+        databaseConnection.where({id: id}).update({imageUrl, englishDescription, portugueseDescription, photoType, approved, highlightImage}).table('photos')
             .then(updatedPhoto => response.json({message: 'Informações atualizadas com sucesso!'}))
             .catch(error => console.log('ERROR: ', error))
     }
@@ -65,7 +79,7 @@ class PhotosController{
     deletePhoto(request, response){
         const { id } = request.params
 
-        database.where({id: id}).del().table('photos')
+        databaseConnection.where({id: id}).del().table('photos')
             .then(data => response.json({message: 'Foto apagada!'}))
             .catch(error => console.log('ERROR: ', error))
     }
