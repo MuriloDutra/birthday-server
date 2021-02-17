@@ -5,10 +5,10 @@ const bodyParser = require('body-parser');
 const cors = require('cors')
 const port = 4000
 
-const routes = require('./routes/photos.route')
+const routes = require('./src/routes/photos.route')
 
 app.use(cors())
-app.use(express.static('../public'))
+app.use('/static', express.static('public'))
 app.use(bodyParser.json({parameterLimit: 100000, limit: '50mb', extended: true}))
 app.use(routes)
 
