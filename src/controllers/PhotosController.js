@@ -44,20 +44,20 @@ class PhotosController{
     //POST
     async newPhotos(request, response){
         try{
-            const { imageUrl, englishDescription, portugueseDescription, photoType, approved, highlightImage } = request.body
-            
-            base64Img.img(imageUrl, 'public', Date.now(), (err, filepath) => {
+            const { imageBase64, englishDescription, portugueseDescription, photoType, approved, highlightImage } = request.body
+            const date = Date.now()
+
+            base64Img.img(imageBase64, 'public', date, (err, filepath) => {
                 const pathArr = filepath.split('/')
                 const fileName = pathArr[pathArr.length - 1]
+                const positionDot = fileName.match(/\./).index
+                const fileType = fileName.slice(positionDot, fileName.length)
+                const imageUrl = `http://localhost:4000/static/${date}${fileType}`
 
-                response.send({
-                    success: true,
-                    url: `htpp://127.0.0.1:4000/${fileName}`
-                })
+                databaseConnection.insert({imageUrl}).table('photos')
+                    .then(data => response.json({message: 'Foto enviada com sucesso!'}))
+                    .catch(error => console.log('ERROR: ', error))
             })
-            /*databaseConnection.insert({imageUrl, englishDescription, portugueseDescription, photoType, approved, highlightImage}).table('photos')
-                .then(data => response.json({message: 'Foto enviada com sucesso!'}))
-                .catch(error => console.log('ERROR: ', error))*/
         }catch(error){
             console.log(error)
         }
