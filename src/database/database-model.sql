@@ -18,5 +18,6 @@ CREATE TABLE user (
     accountPassword VARCHAR(150)
 );
 
+ALTER TABLE birthdayCamila.user ADD token varchar(32);
 SELECT * FROM birthdayCamila.user;
 SELECT * FROM birthdayCamila.photos;

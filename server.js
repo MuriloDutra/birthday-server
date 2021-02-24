@@ -5,13 +5,15 @@ const bodyParser = require('body-parser');
 const cors = require('cors')
 const port = 4000
 
-const routes = require('./src/routes/photos.route')
+const photosRoutes = require('./src/routes/photos.route')
+const userRoutes = require('./src/routes/user.route')
 
 app.use(cors())
 app.use('/static', express.static('public'))
 app.use(bodyParser.json({parameterLimit: 100000, limit: '50mb', extended: true}))
-app.use(routes)
 
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:4000`)
-})
+//Routes
+app.use(userRoutes)
+app.use(photosRoutes)
+
+app.listen(port, () => console.log(`Server running at http://localhost:4000`))
