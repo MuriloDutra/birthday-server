@@ -6,22 +6,22 @@ class PhotosController{
     //GETTERS
     getPhotos(request, response){
         databaseConnection.select('*').table('photos')
-            .then(photos => response.json(photos))
-            .catch(error => console.log('ERROR: ', error))
+            .then(photos => response.status(200).send(photos))
+            .catch(error => response.status(500).send('error_to_load_photos'))
     }
 
 
     getApprovedPhotos(request, response){
         databaseConnection.select('*').table('photos').where({approved: 1})
-            .then(photos => response.json(photos))
-            .catch(error => console.log('ERROR: ', error))
+            .then(photos => response.status(200).send(photos))
+            .catch(error => response.status(500).send('error_to_load_approved_photos'))
     }
 
 
     getUnapprovedPhotos(request, response){
         databaseConnection.select('*').table('photos').where({approved: 0})
-            .then(photos => response.json(photos))
-            .catch(error => console.log('ERROR: ', error))
+            .then(photos => response.status(200).send(photos))
+            .catch(error => response.status(500).send('error_to_load_unapproved_photos'))
     }
 
 
@@ -29,40 +29,44 @@ class PhotosController{
         const { id } = request.params
 
         databaseConnection.select('*').table('photos').where({id: id})
-            .then(photo => response.json(photo))
-            .catch(error => console.log('ERROR: ', error))
+            .then(photo => response.status(200).send(photo))
+            .catch(error => response.status(500).send('error_to_get_photo_by_id'))
     }
 
 
     getHighlightPhotos(request, response){
         databaseConnection.select('*').table('photos').where({highlightImage: 1})
-            .then(photos => response.json(photos))
-            .catch(error => console.log('ERROR: ', error))
+            .then(photos => response.status(200).send(photos))
+            .catch(error => response.status(500).send('error_to_load_highlight_photos'))
     }
 
 
     //POST
     async newPhotos(request, response){
-        const { imagesBase64 } = request.body
+        try{
+            const { imagesBase64 } = request.body
 
-        imagesBase64.forEach((image, index) => {
-            const date = Date.now()
+            imagesBase64.forEach((image, index) => {
+                const date = Date.now()
 
-            base64Img.img(image, 'public', date, async (err, filepath) => {
-                const pathArr = filepath.split('/')
-                const fileName = pathArr[pathArr.length - 1]
-                const positionDot = fileName.match(/\./).index
-                const fileType = fileName.slice(positionDot, fileName.length)
-                const imageUrl = `http://localhost:4000/static/${date}${fileType}`
+                base64Img.img(image, 'public', date, async (err, filepath) => {
+                    const pathArr = filepath.split('/')
+                    const fileName = pathArr[pathArr.length - 1]
+                    const positionDot = fileName.match(/\./).index
+                    const fileType = fileName.slice(positionDot, fileName.length)
+                    const imageUrl = `http://localhost:4000/static/${date}${fileType}`
 
-                await databaseConnection.insert({imageUrl}).table('photos')
+                    //await databaseConnection.insert({imageUrl}).table('photos')
 
-                if(index + 1 === imagesBase64.length){
-                    let message = imagesBase64.length > 1 ? 'Fotos enviadas com sucesso!' : 'Foto enviadas com sucesso!'
-                    response.json({message: message})
-                }
+                    if(imagesBase64.length - 1 === index){
+                        let message = imagesBase64.length > 1 ? 'Fotos enviadas com sucesso!' : 'Foto enviadas com sucesso!'
+                        response.status(200).send({message: message})
+                    }
+                })
             })
-        })
+        }catch(error){
+            response.status(500).send('error_to_post_new_photos')
+        }
     }
 
 
@@ -72,8 +76,8 @@ class PhotosController{
         const { imageUrl, englishDescription, portugueseDescription, photoType, approved, highlightImage } = request.body
 
         databaseConnection.where({id: id}).update({imageUrl, englishDescription, portugueseDescription, photoType, approved, highlightImage}).table('photos')
-            .then(updatedPhoto => response.json({message: 'Informações atualizadas com sucesso!'}))
-            .catch(error => console.log('ERROR: ', error))
+            .then(updatedPhoto => response.status(200).send({message: 'Informações atualizadas com sucesso!'}))
+            .catch(error => response.status(500).send('error_to_update_photo'))
     }
 
 
@@ -82,8 +86,8 @@ class PhotosController{
         const { id } = request.params
 
         databaseConnection.where({id: id}).del().table('photos')
-            .then(data => response.json({message: 'Foto apagada!'}))
-            .catch(error => console.log('ERROR: ', error))
+            .then(data => response.status(200).send({message: 'Foto apagada!'}))
+            .catch(error => response.status(500).send('error_to_delete_photo'))
     }
 }
 
