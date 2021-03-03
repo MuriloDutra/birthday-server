@@ -1,5 +1,5 @@
 const databaseConnection = require('../database/connection')
-const base64Img = require('base64-img')
+const saveImageOnServer = require('../helpers/index')
 
 
 class PhotosController{
@@ -42,27 +42,21 @@ class PhotosController{
 
 
     //POST
-    async newPhotos(request, response){
+    newPhotos(request, response){
         try{
             const { imagesBase64 } = request.body
-
-            imagesBase64.forEach((image, index) => {
+            
+            imagesBase64.forEach(async (image, index) => {
                 const date = Date.now()
+                const filename = saveImageOnServer(image, date)
+                const filePath = `http://localhost:4000/static/${filename.slice(7, filename.length)}`
 
-                base64Img.img(image, 'public', date, async (err, filepath) => {
-                    const pathArr = filepath.split('/')
-                    const fileName = pathArr[pathArr.length - 1]
-                    const positionDot = fileName.match(/\./).index
-                    const fileType = fileName.slice(positionDot, fileName.length)
-                    const imageUrl = `http://localhost:4000/static/${date}${fileType}`
+                await databaseConnection.insert({imageUrl: filePath, approved: 0}).table('photos')
 
-                    //await databaseConnection.insert({imageUrl}).table('photos')
-
-                    if(imagesBase64.length - 1 === index){
-                        let message = imagesBase64.length > 1 ? 'Fotos enviadas com sucesso!' : 'Foto enviadas com sucesso!'
-                        response.status(200).send({message: message})
-                    }
-                })
+                if(imagesBase64.length - 1 === index){
+                    let message = imagesBase64.length > 1 ? 'Fotos enviadas com sucesso!' : 'Foto enviadas com sucesso!'
+                    response.status(200).send({message: message})
+                }
             })
         }catch(error){
             response.status(500).send('error_to_post_new_photos')
