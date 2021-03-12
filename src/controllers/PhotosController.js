@@ -67,10 +67,10 @@ class PhotosController{
     //UPDATE
     updatePhoto(request, response){
         const { id } = request.params
-        const { imageUrl, englishDescription, portugueseDescription, photoType, approved, highlightImage } = request.body
+        const { englishDescription, portugueseDescription, imageName } = request.body
 
-        databaseConnection.where({id: id}).update({imageUrl, englishDescription, portugueseDescription, photoType, approved, highlightImage}).table('photos')
-            .then(updatedPhoto => response.status(200).send({message: 'Informações atualizadas com sucesso!'}))
+        databaseConnection.where({id: id}).update({englishDescription, portugueseDescription, imageName}).table('photos')
+            .then(updatedPhoto => response.status(200).send({message: 'Informações da foto atualizadas com sucesso!'}))
             .catch(error => response.status(500).send('error_to_update_photo'))
     }
 
@@ -90,6 +90,24 @@ class PhotosController{
         databaseConnection.where({id: id}).update({approved: 0}).table('photos')
             .then(updatedPhoto => response.status(200).send({message: 'Foto desaprovada com sucesso!'}))
             .catch(error => response.status(500).send('error_to_update_photo'))
+    }
+
+
+    highlightPhotoById(request, response){
+        const { id } = request.params
+
+        databaseConnection.where({id: id}).update({highlightImage: 1}).table('photos')
+            .then(updatedPhoto => response.status(200).send({message: 'Foto adicionada aos destaques!'}))
+            .catch(error => response.status(500).send('error_to_higilight_photo'))
+    }
+
+
+    unhighlightPhotoById(request, response){
+        const { id } = request.params
+
+        databaseConnection.where({id: id}).update({highlightImage: 0}).table('photos')
+            .then(updatedPhoto => response.status(200).send({message: 'Foto removida dos destaques!'}))
+            .catch(error => response.status(500).send('error_to_unhigilight_photo'))
     }
 
 

@@ -19,5 +19,8 @@ CREATE TABLE user (
 );
 
 ALTER TABLE birthdayCamila.user ADD token varchar(32);
+ALTER TABLE birthdayCamila.photos drop column photoType;
+ALTER TABLE birthdayCamila.photos ADD imageName varchar(32);
+
 SELECT * FROM birthdayCamila.user;
 SELECT * FROM birthdayCamila.photos;
