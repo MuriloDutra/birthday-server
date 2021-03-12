@@ -75,6 +75,24 @@ class PhotosController{
     }
 
 
+    approvePhotoById(request, response){
+        const { id } = request.params
+
+        databaseConnection.where({id: id}).update({approved: 1}).table('photos')
+            .then(updatedPhoto => response.status(200).send({message: 'Foto aprovada com sucesso!'}))
+            .catch(error => response.status(500).send('error_to_update_photo'))
+    }
+
+
+    unapprovePhotoById(request, response){
+        const { id } = request.params
+
+        databaseConnection.where({id: id}).update({approved: 0}).table('photos')
+            .then(updatedPhoto => response.status(200).send({message: 'Foto desaprovada com sucesso!'}))
+            .catch(error => response.status(500).send('error_to_update_photo'))
+    }
+
+
     //DELETE
     deletePhoto(request, response){
         const { id } = request.params

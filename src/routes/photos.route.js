@@ -20,6 +20,10 @@ router.post('/sendPhotos', PhotosController.newPhotos);
 
 router.put('/updatePhoto/:id', PhotosController.updatePhoto)
 
+router.put('/approvePhotoById/:id', PhotosController.approvePhotoById)
+
+router.put('/unapprovePhotoById/:id', PhotosController.unapprovePhotoById)
+
 router.delete('/deletePhoto/:id', PhotosController.deletePhoto)
 
 module.exports = router
