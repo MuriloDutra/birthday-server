@@ -1,13 +1,20 @@
 const databaseConnection = require('../database/connection')
-const saveImageOnServer = require('../helpers/index')
+const helper = require('../helpers/index');
 
 
 class PhotosController{
     //GETTERS
-    getPhotos(request, response){
-        databaseConnection.select('*').table('photos')
-            .then(photos => response.status(200).send(photos))
-            .catch(error => response.status(500).send('error_to_load_photos'))
+    async getPhotos(request, response){
+        const { authorization } = request.headers
+        const user =  await helper.findUserByToken(authorization)
+
+        if(user){
+            databaseConnection.select('*').table('photos')
+                .then(photos => response.status(200).send(photos))
+                .catch(error => response.status(500).send('error_to_load_photos'))
+        }else{
+            response.status(404).send('user_not_found')
+        }
     }
 
 
@@ -18,19 +25,32 @@ class PhotosController{
     }
 
 
-    getUnapprovedPhotos(request, response){
-        databaseConnection.select('*').table('photos').where({approved: 0})
-            .then(photos => response.status(200).send(photos))
-            .catch(error => response.status(500).send('error_to_load_unapproved_photos'))
+    async getUnapprovedPhotos(request, response){
+        const { authorization } = request.headers
+        const user =  await helper.findUserByToken(authorization)
+
+        if(user){
+            databaseConnection.select('*').table('photos').where({approved: 0})
+                .then(photos => response.status(200).send(photos))
+                .catch(error => response.status(500).send('error_to_load_unapproved_photos'))
+        }else{
+            response.status(404).send('user_not_found')
+        }
     }
 
 
-    getPhotoById(request, response){
+    async getPhotoById(request, response){
         const { id } = request.params
+        const { authorization } = request.headers
+        const user =  await helper.findUserByToken(authorization)
 
-        databaseConnection.select('*').table('photos').where({id: id})
-            .then(photo => response.status(200).send(photo))
-            .catch(error => response.status(500).send('error_to_get_photo_by_id'))
+        if(user){
+            databaseConnection.select('*').table('photos').where({id: id})
+                .then(photo => response.status(200).send(photo))
+                .catch(error => response.status(500).send('error_to_get_photo_by_id'))
+        }else{
+            response.status(404).send('user_not_found')
+        }
     }
 
 
@@ -48,7 +68,7 @@ class PhotosController{
             
             imagesBase64.forEach(async (image, index) => {
                 const date = Date.now()
-                const filename = saveImageOnServer(image, date)
+                const filename = helper.saveImageOnServer(image, date)
                 const filePath = `http://localhost:4000/static/${filename.slice(7, filename.length)}`
 
                 await databaseConnection.insert({imageUrl: filePath, approved: 0}).table('photos')
@@ -65,59 +85,100 @@ class PhotosController{
 
 
     //UPDATE
-    updatePhoto(request, response){
-        const { id } = request.params
-        const { englishDescription, portugueseDescription, imageName } = request.body
+    async updatePhoto(request, response){
+        const { authorization } = request.headers
+        const user =  await helper.findUserByToken(authorization)
 
-        databaseConnection.where({id: id}).update({englishDescription, portugueseDescription, imageName}).table('photos')
-            .then(updatedPhoto => response.status(200).send({message: 'Informações da foto atualizadas com sucesso!'}))
-            .catch(error => response.status(500).send('error_to_update_photo'))
+        if(user){
+            const { id } = request.params
+            const { englishDescription, portugueseDescription, imageName } = request.body
+
+            databaseConnection.where({id: id}).update({englishDescription, portugueseDescription, imageName}).table('photos')
+                .then(updatedPhoto => response.status(200).send({message: 'Informações da foto atualizadas com sucesso!'}))
+                .catch(error => response.status(500).send('error_to_update_photo'))
+        }else{
+            response.status(404).send('user_not_found')
+        }
     }
 
 
-    approvePhotoById(request, response){
-        const { id } = request.params
+    async approvePhotoById(request, response){
+        const { authorization } = request.headers
+        const user =  await helper.findUserByToken(authorization)
 
-        databaseConnection.where({id: id}).update({approved: 1}).table('photos')
-            .then(updatedPhoto => response.status(200).send({message: 'Foto aprovada com sucesso!'}))
-            .catch(error => response.status(500).send('error_to_update_photo'))
+        if(user){
+            const { id } = request.params
+            databaseConnection.where({id: id}).update({approved: 1}).table('photos')
+                .then(updatedPhoto => response.status(200).send({message: 'Foto aprovada com sucesso!'}))
+                .catch(error => response.status(500).send('error_to_update_photo'))
+        }else{
+            response.status(404).send('user_not_found')
+        }
     }
 
 
-    unapprovePhotoById(request, response){
-        const { id } = request.params
+    async unapprovePhotoById(request, response){
+        const { authorization } = request.headers
+        const user =  await helper.findUserByToken(authorization)
 
-        databaseConnection.where({id: id}).update({approved: 0}).table('photos')
-            .then(updatedPhoto => response.status(200).send({message: 'Foto desaprovada com sucesso!'}))
-            .catch(error => response.status(500).send('error_to_update_photo'))
+        if(user){
+            const { id } = request.params
+
+            databaseConnection.where({id: id}).update({approved: 0}).table('photos')
+                .then(updatedPhoto => response.status(200).send({message: 'Foto desaprovada com sucesso!'}))
+                .catch(error => response.status(500).send('error_to_update_photo'))
+        }else{
+            response.status(404).send('user_not_found')
+        }
     }
 
 
-    highlightPhotoById(request, response){
-        const { id } = request.params
+    async highlightPhotoById(request, response){
+        const { authorization } = request.headers
+        const user =  await helper.findUserByToken(authorization)
 
-        databaseConnection.where({id: id}).update({highlightImage: 1}).table('photos')
-            .then(updatedPhoto => response.status(200).send({message: 'Foto adicionada aos destaques!'}))
-            .catch(error => response.status(500).send('error_to_higilight_photo'))
+        if(user){
+            const { id } = request.params
+
+            databaseConnection.where({id: id}).update({highlightImage: 1}).table('photos')
+                .then(updatedPhoto => response.status(200).send({message: 'Foto adicionada aos destaques!'}))
+                .catch(error => response.status(500).send('error_to_higilight_photo'))
+        }else{
+            response.status(404).send('user_not_found')
+        }        
     }
 
 
-    unhighlightPhotoById(request, response){
-        const { id } = request.params
+    async unhighlightPhotoById(request, response){
+        const { authorization } = request.headers
+        const user =  await helper.findUserByToken(authorization)
 
-        databaseConnection.where({id: id}).update({highlightImage: 0}).table('photos')
-            .then(updatedPhoto => response.status(200).send({message: 'Foto removida dos destaques!'}))
-            .catch(error => response.status(500).send('error_to_unhigilight_photo'))
+        if(user){
+            const { id } = request.params
+
+            databaseConnection.where({id: id}).update({highlightImage: 0}).table('photos')
+                .then(updatedPhoto => response.status(200).send({message: 'Foto removida dos destaques!'}))
+                .catch(error => response.status(500).send('error_to_unhigilight_photo'))
+        }else{
+            response.status(404).send('user_not_found')
+        }
     }
 
 
     //DELETE
-    deletePhoto(request, response){
-        const { id } = request.params
+    async deletePhoto(request, response){
+        const { authorization } = request.headers
+        const user =  await helper.findUserByToken(authorization)
 
-        databaseConnection.where({id: id}).del().table('photos')
-            .then(data => response.status(200).send({message: 'Foto apagada!'}))
-            .catch(error => response.status(500).send('error_to_delete_photo'))
+        if(user){
+            const { id } = request.params
+
+            databaseConnection.where({id: id}).del().table('photos')
+                .then(data => response.status(200).send({message: 'Foto apagada!'}))
+                .catch(error => response.status(500).send('error_to_delete_photo'))
+        }else{
+            response.status(404).send('user_not_found')
+        }
     }
 }
 
