@@ -26,14 +26,14 @@ class PhotosController{
     }
 
 
-    async getUnapprovedPhotos(request, response){
+    async getDisapprovedPhotos(request, response){
         const { authorization } = request.headers
         const user =  await helper.findUserByToken(authorization)
 
         if(user){
             databaseConnection.select('*').table('photos').where({approved: 0})
                 .then(photos => response.status(200).send(photos))
-                .catch(error => response.status(500).send({error: serverMessages.photos.error_to_load_unapproved_photos}))
+                .catch(error => response.status(500).send({error: serverMessages.photos.error_to_load_disapproved_photos}))
         }else{
             response.status(401).send({error: serverMessages.user.user_not_found})
         }
@@ -118,7 +118,7 @@ class PhotosController{
     }
 
 
-    async unapprovePhotoById(request, response){
+    async disapprovePhotoById(request, response){
         const { authorization } = request.headers
         const user =  await helper.findUserByToken(authorization)
 
@@ -126,8 +126,8 @@ class PhotosController{
             const { id } = request.params
 
             databaseConnection.where({id: id}).update({approved: 0}).table('photos')
-                .then(updatedPhoto => response.status(200).send({message: serverMessages.photos.photo_was_unapproved}))
-                .catch(error => response.status(500).send({error: serverMessages.photos.error_to_unapprove_photo}))
+                .then(updatedPhoto => response.status(200).send({message: serverMessages.photos.photo_was_disapproved}))
+                .catch(error => response.status(500).send({error: serverMessages.photos.error_to_disapprove_photo}))
         }else{
             response.status(401).send({error: serverMessages.user.user_not_found})
         }

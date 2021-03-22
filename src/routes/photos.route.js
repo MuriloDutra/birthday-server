@@ -9,7 +9,7 @@ router.get('/', (req, res) => {
 //GET
 router.get('/getApprovedPhotos', PhotosController.getApprovedPhotos)
 
-router.get('/getUnapprovedPhotos', PhotosController.getUnapprovedPhotos)
+router.get('/getDisapprovedPhotos', PhotosController.getDisapprovedPhotos)
 
 router.get('/getHighlightPhotos', PhotosController.getHighlightPhotos)
 
@@ -25,7 +25,7 @@ router.put('/updatePhoto/:id', PhotosController.updatePhoto)
 
 router.put('/approvePhotoById/:id', PhotosController.approvePhotoById)
 
-router.put('/unapprovePhotoById/:id', PhotosController.unapprovePhotoById)
+router.put('/disapprovePhotoById/:id', PhotosController.disapprovePhotoById)
 
 router.put('/highlightPhotoById/:id', PhotosController.highlightPhotoById)
 
