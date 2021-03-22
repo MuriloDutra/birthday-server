@@ -1,3 +1,4 @@
+const serverMessages = require('../constants/serverMessages');
 const databaseConnection = require('../database/connection')
 const helper = require('../helpers/index');
 
@@ -11,9 +12,9 @@ class PhotosController{
         if(user){
             databaseConnection.select('*').table('photos')
                 .then(photos => response.status(200).send(photos))
-                .catch(error => response.status(500).send('error_to_load_photos'))
+                .catch(error => response.status(500).send({error: serverMessages.photos.error_to_load_photos}))
         }else{
-            response.status(404).send('user_not_found')
+            response.status(401).send({error: serverMessages.user.user_not_found})
         }
     }
 
@@ -21,7 +22,7 @@ class PhotosController{
     getApprovedPhotos(request, response){
         databaseConnection.select('*').table('photos').where({approved: 1})
             .then(photos => response.status(200).send(photos))
-            .catch(error => response.status(500).send('error_to_load_approved_photos'))
+            .catch(error => response.status(500).send({error: serverMessages.photos.error_to_load_approved_photos}))
     }
 
 
@@ -32,9 +33,9 @@ class PhotosController{
         if(user){
             databaseConnection.select('*').table('photos').where({approved: 0})
                 .then(photos => response.status(200).send(photos))
-                .catch(error => response.status(500).send('error_to_load_unapproved_photos'))
+                .catch(error => response.status(500).send({error: serverMessages.photos.error_to_load_unapproved_photos}))
         }else{
-            response.status(404).send('user_not_found')
+            response.status(401).send({error: serverMessages.user.user_not_found})
         }
     }
 
@@ -47,9 +48,9 @@ class PhotosController{
         if(user){
             databaseConnection.select('*').table('photos').where({id: id})
                 .then(photo => response.status(200).send(photo))
-                .catch(error => response.status(500).send('error_to_get_photo_by_id'))
+                .catch(error => response.status(500).send({error: serverMessages.photos.error_to_get_photo_by_id}))
         }else{
-            response.status(404).send('user_not_found')
+            response.status(401).send({error: serverMessages.user.user_not_found})
         }
     }
 
@@ -57,7 +58,7 @@ class PhotosController{
     getHighlightPhotos(request, response){
         databaseConnection.select('*').table('photos').where({highlightImage: 1})
             .then(photos => response.status(200).send(photos))
-            .catch(error => response.status(500).send('error_to_load_highlight_photos'))
+            .catch(error => response.status(500).send({error: serverMessages.photos.error_to_load_highlight_photos}))
     }
 
 
@@ -74,12 +75,12 @@ class PhotosController{
                 await databaseConnection.insert({imageUrl: filePath, approved: 0}).table('photos')
 
                 if(imagesBase64.length - 1 === index){
-                    let message = imagesBase64.length > 1 ? 'Fotos enviadas com sucesso!' : 'Foto enviadas com sucesso!'
+                    let message = imagesBase64.length > 1 ? serverMessages.photos.photos_received : serverMessages.photos.photo_received
                     response.status(200).send({message: message})
                 }
             })
         }catch(error){
-            response.status(500).send('error_to_post_new_photos')
+            response.status(500).send({error: serverMessages.photos.error_to_post_new_photos})
         }
     }
 
@@ -94,10 +95,10 @@ class PhotosController{
             const { englishDescription, portugueseDescription, imageName } = request.body
 
             databaseConnection.where({id: id}).update({englishDescription, portugueseDescription, imageName}).table('photos')
-                .then(updatedPhoto => response.status(200).send({message: 'Informações da foto atualizadas com sucesso!'}))
-                .catch(error => response.status(500).send('error_to_update_photo'))
+                .then(updatedPhoto => response.status(200).send({message: serverMessages.photos.photo_was_updated}))
+                .catch(error => response.status(500).send({error: serverMessages.photos.error_to_update_photo}))
         }else{
-            response.status(404).send('user_not_found')
+            response.status(401).send({error: serverMessages.user.user_not_found})
         }
     }
 
@@ -109,10 +110,10 @@ class PhotosController{
         if(user){
             const { id } = request.params
             databaseConnection.where({id: id}).update({approved: 1}).table('photos')
-                .then(updatedPhoto => response.status(200).send({message: 'Foto aprovada com sucesso!'}))
-                .catch(error => response.status(500).send('error_to_update_photo'))
+                .then(updatedPhoto => response.status(200).send({message: serverMessages.photos.photo_was_approved}))
+                .catch(error => response.status(500).send({error: serverMessages.photos.error_to_approve_photo}))
         }else{
-            response.status(404).send('user_not_found')
+            response.status(401).send({error: serverMessages.user.user_not_found})
         }
     }
 
@@ -125,10 +126,10 @@ class PhotosController{
             const { id } = request.params
 
             databaseConnection.where({id: id}).update({approved: 0}).table('photos')
-                .then(updatedPhoto => response.status(200).send({message: 'Foto desaprovada com sucesso!'}))
-                .catch(error => response.status(500).send('error_to_update_photo'))
+                .then(updatedPhoto => response.status(200).send({message: serverMessages.photos.photo_was_unapproved}))
+                .catch(error => response.status(500).send({error: serverMessages.photos.error_to_unapprove_photo}))
         }else{
-            response.status(404).send('user_not_found')
+            response.status(401).send({error: serverMessages.user.user_not_found})
         }
     }
 
@@ -141,10 +142,10 @@ class PhotosController{
             const { id } = request.params
 
             databaseConnection.where({id: id}).update({highlightImage: 1}).table('photos')
-                .then(updatedPhoto => response.status(200).send({message: 'Foto adicionada aos destaques!'}))
-                .catch(error => response.status(500).send('error_to_higilight_photo'))
+                .then(updatedPhoto => response.status(200).send({message: serverMessages.photos.photo_was_highlighted}))
+                .catch(error => response.status(500).send({error: serverMessages.photos.error_to_higilight_photo}))
         }else{
-            response.status(404).send('user_not_found')
+            response.status(401).send({error: serverMessages.user.user_not_found})
         }        
     }
 
@@ -157,10 +158,10 @@ class PhotosController{
             const { id } = request.params
 
             databaseConnection.where({id: id}).update({highlightImage: 0}).table('photos')
-                .then(updatedPhoto => response.status(200).send({message: 'Foto removida dos destaques!'}))
-                .catch(error => response.status(500).send('error_to_unhigilight_photo'))
+                .then(updatedPhoto => response.status(200).send({message: serverMessages.photos.photo_was_unhighlighted}))
+                .catch(error => response.status(500).send({error: serverMessages.photos.error_to_unhigilight_photo}))
         }else{
-            response.status(404).send('user_not_found')
+            response.status(401).send({error: serverMessages.user.user_not_found})
         }
     }
 
@@ -174,10 +175,10 @@ class PhotosController{
             const { id } = request.params
 
             databaseConnection.where({id: id}).del().table('photos')
-                .then(data => response.status(200).send({message: 'Foto apagada!'}))
-                .catch(error => response.status(500).send('error_to_delete_photo'))
+                .then(data => response.status(200).send({message: serverMessages.photos.photo_deleted}))
+                .catch(error => response.status(500).send({error: serverMessages.photos.error_to_delete_photo}))
         }else{
-            response.status(404).send('user_not_found')
+            response.status(401).send({error: serverMessages.user.user_not_found})
         }
     }
 }
