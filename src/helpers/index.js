@@ -15,7 +15,7 @@ function saveImageOnServer(image, date){
 
 function findUserByToken(token){
     return databaseConnection('user').where({token}).select('*')
-        .then(data => {
+        .then((data) => {
             if(data.length === 0){
                 return false
             }else{
@@ -26,5 +26,18 @@ function findUserByToken(token){
 }
 
 
+function checkIfImageExist(id){
+    return databaseConnection('photos').where({id}).select('*')
+        .then((data) => {
+            if(data.length === 0){
+                return false
+            }
+
+            return true
+        })
+}
+
+
 exports.saveImageOnServer = saveImageOnServer;
 exports.findUserByToken = findUserByToken;
+exports.checkIfImageExist = checkIfImageExist;

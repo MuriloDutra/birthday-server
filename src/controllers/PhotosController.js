@@ -44,6 +44,12 @@ class PhotosController{
         const { id } = request.params
         const { authorization } = request.headers
         const user =  await helper.findUserByToken(authorization)
+        const imageExist = await helper.checkIfImageExist(id)
+
+        if(!imageExist){
+            response.status(404).send({error: serverMessages.photos.photo_not_found})
+            return
+        }
 
         if(user){
             databaseConnection.select('*').table('photos').where({id: id})
@@ -89,9 +95,15 @@ class PhotosController{
     async updatePhoto(request, response){
         const { authorization } = request.headers
         const user =  await helper.findUserByToken(authorization)
+        const { id } = request.params
+        const imageExist = await helper.checkIfImageExist(id)
+
+        if(!imageExist){
+            response.status(404).send({error: serverMessages.photos.photo_not_found})
+            return
+        }
 
         if(user){
-            const { id } = request.params
             const { englishDescription, portugueseDescription, imageName } = request.body
 
             databaseConnection.where({id: id}).update({englishDescription, portugueseDescription, imageName}).table('photos')
@@ -106,9 +118,15 @@ class PhotosController{
     async approvePhotoById(request, response){
         const { authorization } = request.headers
         const user =  await helper.findUserByToken(authorization)
+        const { id } = request.params
+        const imageExist = await helper.checkIfImageExist(id)
+
+        if(!imageExist){
+            response.status(404).send({error: serverMessages.photos.photo_not_found})
+            return
+        }
 
         if(user){
-            const { id } = request.params
             databaseConnection.where({id: id}).update({approved: 1}).table('photos')
                 .then(updatedPhoto => response.status(200).send({message: serverMessages.photos.photo_was_approved}))
                 .catch(error => response.status(500).send({error: serverMessages.photos.error_to_approve_photo}))
@@ -121,10 +139,15 @@ class PhotosController{
     async disapprovePhotoById(request, response){
         const { authorization } = request.headers
         const user =  await helper.findUserByToken(authorization)
+        const { id } = request.params
+        const imageExist = await helper.checkIfImageExist(id)
+
+        if(!imageExist){
+            response.status(404).send({error: serverMessages.photos.photo_not_found})
+            return
+        }
 
         if(user){
-            const { id } = request.params
-
             databaseConnection.where({id: id}).update({approved: 0}).table('photos')
                 .then(updatedPhoto => response.status(200).send({message: serverMessages.photos.photo_was_disapproved}))
                 .catch(error => response.status(500).send({error: serverMessages.photos.error_to_disapprove_photo}))
@@ -137,10 +160,15 @@ class PhotosController{
     async highlightPhotoById(request, response){
         const { authorization } = request.headers
         const user =  await helper.findUserByToken(authorization)
+        const { id } = request.params
+        const imageExist = await helper.checkIfImageExist(id)
+
+        if(!imageExist){
+            response.status(404).send({error: serverMessages.photos.photo_not_found})
+            return
+        }
 
         if(user){
-            const { id } = request.params
-
             databaseConnection.where({id: id}).update({highlightImage: 1}).table('photos')
                 .then(updatedPhoto => response.status(200).send({message: serverMessages.photos.photo_was_highlighted}))
                 .catch(error => response.status(500).send({error: serverMessages.photos.error_to_higilight_photo}))
@@ -153,10 +181,15 @@ class PhotosController{
     async unhighlightPhotoById(request, response){
         const { authorization } = request.headers
         const user =  await helper.findUserByToken(authorization)
+        const { id } = request.params
+        const imageExist = await helper.checkIfImageExist(id)
 
+        if(!imageExist){
+            response.status(404).send({error: serverMessages.photos.photo_not_found})
+            return
+        }
+        
         if(user){
-            const { id } = request.params
-
             databaseConnection.where({id: id}).update({highlightImage: 0}).table('photos')
                 .then(updatedPhoto => response.status(200).send({message: serverMessages.photos.photo_was_unhighlighted}))
                 .catch(error => response.status(500).send({error: serverMessages.photos.error_to_unhigilight_photo}))
@@ -170,10 +203,15 @@ class PhotosController{
     async deletePhoto(request, response){
         const { authorization } = request.headers
         const user =  await helper.findUserByToken(authorization)
+        const { id } = request.params
+        const imageExist = await helper.checkIfImageExist(id)
+
+        if(!imageExist){
+            response.status(404).send({error: serverMessages.photos.photo_not_found})
+            return
+        }
 
         if(user){
-            const { id } = request.params
-
             databaseConnection.where({id: id}).del().table('photos')
                 .then(data => response.status(200).send({message: serverMessages.photos.photo_deleted}))
                 .catch(error => response.status(500).send({error: serverMessages.photos.error_to_delete_photo}))

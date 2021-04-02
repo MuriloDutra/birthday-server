@@ -25,7 +25,8 @@ const serverMessages = {
         photo_was_disapproved: "photo_was_disapproved",
         photo_was_highlighted: "photo_was_highlighted",
         photo_was_unhighlighted: "photo_was_unhighlighted",
-        photo_deleted: "photo_deleted"
+        photo_deleted: "photo_deleted",
+        photo_not_found: "photo_not_found"
     }
 }
 
