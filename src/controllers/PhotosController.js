@@ -7,11 +7,21 @@ class PhotosController{
     //GETTERS
     async getPhotos(request, response){
         const { authorization } = request.headers
+        const { query } = request
+        const pageNumber = query.pageNumber ? parseInt(query.pageNumber) : 1;
+        const pageSize = query.pageSize ? parseInt(query.pageSize) : 10
+        const offset = (pageNumber - 1) * pageSize;
         const user =  await helper.findUserByToken(authorization)
 
         if(user){
-            databaseConnection.select('*').table('photos')
-                .then(photos => response.status(200).send(photos))
+            
+            Promise.all([
+                databaseConnection.count('* as count').from('photos').first(),
+                databaseConnection.select('*').table('photos').offset(offset).limit(pageSize)
+            ])
+                .then(([total, rows]) => {
+                    response.status(200).send(rows)
+                })
                 .catch(error => response.status(500).send({error: serverMessages.photos.error_to_load_photos}))
         }else{
             response.status(401).send({error: serverMessages.user.user_not_found})
