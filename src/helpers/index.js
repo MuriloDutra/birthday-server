@@ -38,6 +38,20 @@ function checkIfImageExist(id){
 }
 
 
+function paginate(request){
+    const { query } = request
+    const pageNumber = (query.pageNumber && query.pageNumber > 0) ? parseInt(query.pageNumber) : 1;
+    const pageSize = query.pageSize ? parseInt(query.pageSize) : 15
+    const offset = (pageNumber - 1) * pageSize;
+
+    return {
+        pageSize: pageSize,
+        offset: offset
+    }
+}
+
+
 exports.saveImageOnServer = saveImageOnServer;
 exports.findUserByToken = findUserByToken;
 exports.checkIfImageExist = checkIfImageExist;
+exports.paginate = paginate;

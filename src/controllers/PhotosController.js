@@ -7,21 +7,16 @@ class PhotosController{
     //GETTERS
     async getPhotos(request, response){
         const { authorization } = request.headers
-        const { query } = request
-        const pageNumber = query.pageNumber ? parseInt(query.pageNumber) : 1;
-        const pageSize = query.pageSize ? parseInt(query.pageSize) : 10
-        const offset = (pageNumber - 1) * pageSize;
         const user =  await helper.findUserByToken(authorization)
 
         if(user){
-            
+            const paginateParams = helper.paginate(request)
+
             Promise.all([
                 databaseConnection.count('* as count').from('photos').first(),
-                databaseConnection.select('*').table('photos').offset(offset).limit(pageSize)
+                databaseConnection.select('*').table('photos').offset(paginateParams.offset).limit(paginateParams.pageSize)
             ])
-                .then(([total, rows]) => {
-                    response.status(200).send(rows)
-                })
+                .then(([total, rows]) => response.status(200).send(rows))
                 .catch(error => response.status(500).send({error: serverMessages.photos.error_to_load_photos}))
         }else{
             response.status(401).send({error: serverMessages.user.user_not_found})
@@ -30,9 +25,14 @@ class PhotosController{
 
 
     getApprovedPhotos(request, response){
-        databaseConnection.select('*').table('photos').where({approved: 1})
-            .then(photos => response.status(200).send(photos))
-            .catch(error => response.status(500).send({error: serverMessages.photos.error_to_load_approved_photos}))
+        const paginateParams = helper.paginate(request)
+
+        Promise.all([
+            databaseConnection.count('* as count').from('photos').first(),
+            databaseConnection.select('*').table('photos').where({approved: 1}).offset(paginateParams.offset).limit(paginateParams.pageSize)
+        ])
+            .then(([total, rows]) => response.status(200).send(rows))
+            .catch(error => response.status(500).send({error: serverMessages.photos.error_to_load_photos}))
     }
 
 
@@ -41,8 +41,13 @@ class PhotosController{
         const user =  await helper.findUserByToken(authorization)
 
         if(user){
-            databaseConnection.select('*').table('photos').where({approved: 0})
-                .then(photos => response.status(200).send(photos))
+            const paginateParams = helper.paginate(request)
+
+            Promise.all([
+                databaseConnection.count('* as count').from('photos').first(),
+                databaseConnection.select('*').table('photos').where({approved: 0}).offset(paginateParams.offset).limit(paginateParams.pageSize)
+            ])
+                .then(([total, rows]) => response.status(200).send(rows))
                 .catch(error => response.status(500).send({error: serverMessages.photos.error_to_load_disapproved_photos}))
         }else{
             response.status(401).send({error: serverMessages.user.user_not_found})
@@ -72,9 +77,14 @@ class PhotosController{
 
 
     getHighlightPhotos(request, response){
-        databaseConnection.select('*').table('photos').where({highlightImage: 1})
-            .then(photos => response.status(200).send(photos))
-            .catch(error => response.status(500).send({error: serverMessages.photos.error_to_load_highlight_photos}))
+        const paginateParams = helper.paginate(request)
+
+        Promise.all([
+            databaseConnection.count('* as count').from('photos').first(),
+            databaseConnection.select('*').table('photos').where({highlightImage: 1}).offset(paginateParams.offset).limit(paginateParams.pageSize)
+        ])
+            .then(([total, rows]) => response.status(200).send(rows))
+            .catch(error => response.status(500).send({error: serverMessages.photos.error_to_load_highlight_photos}))            
     }
 
 
