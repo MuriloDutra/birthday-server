@@ -17,6 +17,8 @@ router.get('/getPhotos', PhotosController.getPhotos)
 
 router.get('/getPhotoById/:id', PhotosController.getPhotoById)
 
+router.get('/searchPhoto', PhotosController.searchPhoto)
+
 //POST
 router.post('/sendPhotos', PhotosController.newPhotos);
 

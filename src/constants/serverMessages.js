@@ -10,6 +10,7 @@ const serverMessages = {
         error_to_load_disapproved_photos: "error_to_load_disapproved_photos",
         error_to_get_photo_by_id: "error_to_get_photo_by_id",
         error_to_load_highlight_photos: "error_to_load_highlight_photos",
+        error_to_search_photos: "error_to_search_photos",
         error_to_post_new_photos: "error_to_post_new_photos",
         error_to_update_photo: "error_to_update_photo",
         error_to_approve_photo: "error_to_approve_photo",

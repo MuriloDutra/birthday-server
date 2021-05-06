@@ -88,6 +88,15 @@ class PhotosController{
     }
 
 
+    searchPhoto(request, response){
+        const { searchText } = request.query
+    
+        databaseConnection.select("*").from('photos').where({approved: 1}).and.where('imageName', 'like', `%${searchText}%`)
+            .then((photos) => response.status(200).send(photos))
+            .catch(error => response.status(500).send({error: serverMessages.photos.error_to_search_photos}))            
+    }
+
+
     //POST
     newPhotos(request, response){
         try{
