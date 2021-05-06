@@ -68,7 +68,7 @@ class PhotosController{
 
         if(user){
             databaseConnection.select('*').table('photos').where({id: id})
-                .then(photo => response.status(200).send(photo))
+                .then((photo) => response.status(200).send(photo[0]))
                 .catch(error => response.status(500).send({error: serverMessages.photos.error_to_get_photo_by_id}))
         }else{
             response.status(401).send({error: serverMessages.user.user_not_found})
@@ -148,7 +148,7 @@ class PhotosController{
 
         if(user){
             databaseConnection.where({id: id}).update({approved: 1}).table('photos')
-                .then(updatedPhoto => response.status(200).send({message: serverMessages.photos.photo_was_approved}))
+                .then((updatedPhoto) => response.status(200).send({message: serverMessages.photos.photo_was_approved}))
                 .catch(error => response.status(500).send({error: serverMessages.photos.error_to_approve_photo}))
         }else{
             response.status(401).send({error: serverMessages.user.user_not_found})
