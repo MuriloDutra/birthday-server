@@ -1,0 +1,395 @@
+{
+	"info": {
+		"_postman_id": "10329dbc-cbf7-4976-a122-6bd4a2c9ebad",
+		"name": "birthday-camila",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "photos",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n        \"imageUrl\": \"Nova foto do barcelona\",\r\n        \"englishDescription\": \"english englishDescription\",\r\n        \"portugueseDescription\": \"portuguese portugueseDescription\",\r\n        \"photoType\": \"JPG\",\r\n        \"approved\": 0,\r\n        \"highlightImage\": 0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/sendPhotos",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"sendPhotos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"TESTE\",\r\n    \"password\": \"senhaTest\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/login",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "photos",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "authorization",
+						"value": "91fdcb1c2857c7768acd08230f597a84",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/getPhotos?pageNumber=1&pageSize=15",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"getPhotos"
+					],
+					"query": [
+						{
+							"key": "pageNumber",
+							"value": "1"
+						},
+						{
+							"key": "pageSize",
+							"value": "15"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "photo by ID",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "authorization",
+						"value": "91fdcb1c2857c7768acd08230f597a84",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/getPhotoById/99",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"getPhotoById",
+						"99"
+					],
+					"query": [
+						{
+							"key": "murilo",
+							"value": "de",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "approved photos",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/getApprovedPhotos?pageNumber=1&pageSize=15",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"getApprovedPhotos"
+					],
+					"query": [
+						{
+							"key": "pageNumber",
+							"value": "1"
+						},
+						{
+							"key": "pageSize",
+							"value": "15"
+						},
+						{
+							"key": "searchText",
+							"value": "value",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "disapproved photos",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "authorization",
+						"value": "91fdcb1c2857c7768acd08230f597a84",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/getDisapprovedPhotos?pageNumber=0&pageSize=10",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"getDisapprovedPhotos"
+					],
+					"query": [
+						{
+							"key": "pageNumber",
+							"value": "0"
+						},
+						{
+							"key": "pageSize",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "highlight photos",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/getHighlightPhotos",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"getHighlightPhotos"
+					],
+					"query": [
+						{
+							"key": "pageNumber",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "pageSize",
+							"value": "10",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "search image",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/searchPhoto?searchText=Ryan",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"searchPhoto"
+					],
+					"query": [
+						{
+							"key": "searchText",
+							"value": "Ryan"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update photo",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "authorization",
+						"value": "91fdcb1c2857c7768acd08230f597a84",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"englishDescription\": \"HELLO\",\r\n    \"portugueseDescription\": \"BYE\",\r\n    \"imageName\": \"name\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/updatePhoto/200",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"updatePhoto",
+						"200"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "approve photo by ID",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "authorization",
+						"value": "91fdcb1c2857c7768acd08230f597a84",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/approvePhotoById/200",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"approvePhotoById",
+						"200"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "disapprove photo by ID",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "authorization",
+						"value": "91fdcb1c2857c7768acd08230f597a84",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/disapprovePhotoById/200",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"disapprovePhotoById",
+						"200"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "highlight photo by ID",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "authorization",
+						"value": "91fdcb1c2857c7768acd08230f597a84",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/highlightPhotoById/200",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"highlightPhotoById",
+						"200"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "unhighlight photo by ID",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "authorization",
+						"value": "91fdcb1c2857c7768acd08230f597a84",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/unhighlightPhotoById/200",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"unhighlightPhotoById",
+						"200"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "photo",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "authorization",
+						"value": "91fdcb1c2857c7768acd08230f597a84",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/deletePhoto/200",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"deletePhoto",
+						"200"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
