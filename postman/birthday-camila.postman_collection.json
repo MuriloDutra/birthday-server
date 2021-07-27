@@ -69,7 +69,7 @@
 					}
 				],
 				"url": {
-					"raw": "{{host}}/getPhotos?pageNumber=1&pageSize=15",
+					"raw": "{{host}}/getPhotos?pageNumber=2&pageSize=15",
 					"host": [
 						"{{host}}"
 					],
@@ -79,7 +79,7 @@
 					"query": [
 						{
 							"key": "pageNumber",
-							"value": "1"
+							"value": "2"
 						},
 						{
 							"key": "pageSize",
@@ -127,7 +127,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/getApprovedPhotos?pageNumber=1&pageSize=15",
+					"raw": "{{host}}/getApprovedPhotos?pageNumber=0&pageSize=15",
 					"host": [
 						"{{host}}"
 					],
@@ -137,7 +137,7 @@
 					"query": [
 						{
 							"key": "pageNumber",
-							"value": "1"
+							"value": "0"
 						},
 						{
 							"key": "pageSize",
@@ -146,6 +146,11 @@
 						{
 							"key": "searchText",
 							"value": "value",
+							"disabled": true
+						},
+						{
+							"key": "sort",
+							"value": "ALL_IMAGES",
 							"disabled": true
 						}
 					]
