@@ -9,7 +9,7 @@ class UserController{
         databaseConnection('user').where({email: email, accountPassword: password}).select('*')
             .then(data => {
                 if(data.length === 0){
-                    response.status(404).send(serverMessages.user.user_not_found)
+                    response.status(404).send(serverMessages.user.error_user_not_found)
                     return
                 }
 
