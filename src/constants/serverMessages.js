@@ -19,6 +19,7 @@ const serverMessages = {
         error_to_delete_photo: "error_to_delete_photo",
         error_already_ten_highlighted_photos: "error_already_ten_highlighted_photos",
         error_photo_not_found: "error_photo_not_found",
+        error_not_allowed_disapproved_photo: "error_not_allowed_disapproved_photo",
 
         success_photos_received: "success_photos_received",
         success_photo_received: "success_photo_received",

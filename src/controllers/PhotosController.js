@@ -195,17 +195,27 @@ class PhotosController{
             
 
         if(user){
-            database_connection.select('*').table('photos').where({highlightImage: 1})
-                .then((photos) => {
-                    if(photos.length >= 10){
-                        response.status(406).send({error: serverMessages.photos.error_already_ten_highlighted_photos})
-                        return
-                    }
+            try {
+                const highlightImages = await database_connection.select('*').table('photos').where({highlightImage: 1});
+                const selectedImage = await database_connection.select('*').table('photos').where({id: id});
+                
+                const maximumOfHighlightPhotos = (highlightImages.length >= 10);
+                const isADisapprovedPhoto = (selectedImage[0]?.approved === 0)
 
-                    database_connection.where({id: id}).update({highlightImage: 1}).table('photos')
-                        .then(updatedPhoto => response.status(200).send({message: serverMessages.photos.success_photo_was_highlighted}))
-                        .catch(() => response.status(500).send({error: serverMessages.photos.error_to_higilight_photo}))
-                })
+                if(maximumOfHighlightPhotos){
+                    response.status(406).send({error: serverMessages.photos.error_already_ten_highlighted_photos})
+                    return
+                }
+                if(isADisapprovedPhoto){
+                    response.status(406).send({error: serverMessages.photos.error_not_allowed_disapproved_photo})
+                    return
+                }
+
+                database_connection.where({id: id}).where({approved: 1}).update({highlightImage: 1}).table('photos')
+                    .then(updatedPhoto => response.status(200).send({message: serverMessages.photos.success_photo_was_highlighted}))
+            }catch{
+                response.status(500).send({error: serverMessages.photos.error_to_higilight_photo})
+            }
         }else
             response.status(401).send({error: serverMessages.user.error_user_not_found})
     }
