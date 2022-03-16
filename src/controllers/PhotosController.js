@@ -9,13 +9,22 @@ class PhotosController{
         const user =  await helper.findUserByToken(authorization)
 
         if(user){
-            const paginateParams = helper.paginate(request)
+            const {offset, pageSize, pageNumber} = helper?.paginate(request)
 
             Promise.all([
                 database_connection.count('* as count').from('photos').first(),
-                database_connection.select('*').table('photos').offset(paginateParams.offset).limit(paginateParams.pageSize)
+                database_connection.select('*').table('photos').offset(offset).limit(pageSize)
             ])
-                .then(([total, rows]) => response.status(200).send(rows))
+                .then(([total, rows]) => {
+                    const data = {
+                        totalElements: total?.count,
+                        pageSize: pageSize,
+                        page: pageNumber,
+                        totalPages: Math.round(total?.count / pageSize),
+                        results: rows,
+                    }
+                    response.status(200).send(data)
+                })
                 .catch(() => response.status(500).send({error: serverMessages.photos.error_to_load_photos}))
         }else
             response.status(401).send({error: serverMessages.user.error_user_not_found})
@@ -23,22 +32,29 @@ class PhotosController{
 
 
     getApprovedPhotos(request, response){
-        const paginateParams = helper.paginate(request)
-        const { sort } = request.query;
-        let query;
-
-        if(!sort)
-            query = database_connection.select('*').table('photos').where({approved: 1}).where({highlightImage: 0});
-        else if(sort && sort === "ALL_IMAGES")
-            query = database_connection.select('*').table('photos').where({approved: 1});
+        const {offset, pageSize, pageNumber} = helper?.paginate(request)
+        let query = database_connection.select('*').table('photos').where({approved: 1, highlightImage: 0});
 
         Promise.all([
-            database_connection.count('* as count').from('photos').first(),
-            query
-                .offset(paginateParams.offset).limit(paginateParams.pageSize)
+            database_connection.count('* as count').from('photos').where({approved: 1, highlightImage: 0}).first(),
+            query.offset(offset).limit(pageSize)
         ])
-            .then(([total, rows]) => response.status(200).send(rows))
-            .catch(() => response.status(500).send({error: serverMessages.photos.error_to_load_photos}))
+            .then(([total, rows]) => {
+                const data = {
+                    totalElements: total?.count,
+                    pageSize: pageSize,
+                    page: pageNumber,
+                    totalPages: Math.round(total?.count / pageSize),
+                    results: rows,
+                }
+                response.status(200).send(data)
+            })
+            .catch((error) => {
+                response.status(500).send({
+                    error: serverMessages.photos.error_to_load_photos,
+                    data: error
+                })
+            })
     }
 
 
@@ -47,13 +63,22 @@ class PhotosController{
         const user =  await helper.findUserByToken(authorization)
 
         if(user){
-            const paginateParams = helper.paginate(request)
+            const {offset, pageSize, pageNumber} = helper?.paginate(request)
 
             Promise.all([
-                database_connection.count('* as count').from('photos').first(),
-                database_connection.select('*').table('photos').where({approved: 0}).offset(paginateParams.offset).limit(paginateParams.pageSize)
+                database_connection.count('* as count').from('photos').where({approved: 0}).first(),
+                database_connection.select('*').table('photos').where({approved: 0}).offset(offset).limit(pageSize)
             ])
-                .then(([total, rows]) => response.status(200).send(rows))
+                .then(([total, rows]) => {
+                    const data = {
+                        totalElements: total?.count,
+                        pageSize: pageSize,
+                        page: pageNumber,
+                        totalPages: Math.round(total?.count / pageSize),
+                        results: rows,
+                    }
+                    response.status(200).send(data)
+                })
                 .catch(() => response.status(500).send({error: serverMessages.photos.error_to_load_disapproved_photos}))
         }else
             response.status(401).send({error: serverMessages.user.error_user_not_found})
