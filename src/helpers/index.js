@@ -41,8 +41,8 @@ function checkIfImageExist(id){
 function paginate(request){
     const { query } = request
     const pageNumber = parseInt(query.pageNumber || 0);
-    const pageSize = query.pageSize ? parseInt(query.pageSize) : 20
-    const offset = (pageNumber) * pageSize;
+    const pageSize = parseInt(query.pageSize || 20)
+    const offset = (pageNumber * pageSize);
 
     return {
         pageSize: pageSize,

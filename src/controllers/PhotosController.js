@@ -1,5 +1,5 @@
 const serverMessages = require('../constants/serverMessages');
-const database_connection = require('../database/connection')
+const dbConnection = require('../database/connection')
 const helper = require('../helpers/index');
 
 class PhotosController{
@@ -12,8 +12,8 @@ class PhotosController{
             const {offset, pageSize, pageNumber} = helper?.paginate(request)
 
             Promise.all([
-                database_connection.count('* as count').from('photos').first(),
-                database_connection.select('*').table('photos').offset(offset).limit(pageSize)
+                dbConnection.count('* as count').from('photos').first(),
+                dbConnection.select('*').table('photos').offset(offset).limit(pageSize)
             ])
                 .then(([total, rows]) => {
                     const data = {
@@ -33,10 +33,21 @@ class PhotosController{
 
     getApprovedPhotos(request, response){
         const {offset, pageSize, pageNumber} = helper?.paginate(request)
-        let query = database_connection.select('*').table('photos').where({approved: 1, highlightImage: 0});
+        const { sortBy } = {...request?.query}
+        let conterQuery = null
+        let query = null;
+
+        if(sortBy === "ALL_IMAGES"){
+            conterQuery = dbConnection.count('* as count').from('photos').where({approved: 1})
+            query = dbConnection.select('*').table('photos').where({approved: 1});
+        }
+        else{
+            conterQuery = dbConnection.count('* as count').from('photos').where({approved: 1, highlightImage: 0})
+            query = dbConnection.select('*').table('photos').where({approved: 1, highlightImage: 0});
+        }
 
         Promise.all([
-            database_connection.count('* as count').from('photos').where({approved: 1, highlightImage: 0}).first(),
+            conterQuery?.first(),
             query.offset(offset).limit(pageSize)
         ])
             .then(([total, rows]) => {
@@ -66,8 +77,8 @@ class PhotosController{
             const {offset, pageSize, pageNumber} = helper?.paginate(request)
 
             Promise.all([
-                database_connection.count('* as count').from('photos').where({approved: 0}).first(),
-                database_connection.select('*').table('photos').where({approved: 0}).offset(offset).limit(pageSize)
+                dbConnection.count('* as count').from('photos').where({approved: 0}).first(),
+                dbConnection.select('*').table('photos').where({approved: 0}).offset(offset).limit(pageSize)
             ])
                 .then(([total, rows]) => {
                     const data = {
@@ -97,7 +108,7 @@ class PhotosController{
         }
 
         if(user){
-            database_connection.select('*').table('photos').where({id: id})
+            dbConnection.select('*').table('photos').where({id: id})
                 .then((photo) => response.status(200).send(photo[0]))
                 .catch(() => response.status(500).send({error: serverMessages.photos.error_to_get_photo_by_id}))
         }else
@@ -106,7 +117,7 @@ class PhotosController{
 
 
     getHighlightPhotos(request, response){
-        database_connection.select('*').table('photos').where({highlightImage: 1})
+        dbConnection.select('*').table('photos').where({highlightImage: 1})
             .then((photos) => response.status(200).send(photos))
             .catch(() => response.status(500).send({error: serverMessages.photos.error_to_load_highlight_photos}))
     }
@@ -115,7 +126,7 @@ class PhotosController{
     searchPhoto(request, response){
         const { searchText } = request.query
     
-        database_connection.select("*").from('photos').where({approved: 1}).and.where('imageName', 'like', `%${searchText}%`)
+        dbConnection.select("*").from('photos').where({approved: 1}).and.where('imageName', 'like', `%${searchText}%`)
             .then((photos) => response.status(200).send(photos))
             .catch(() => response.status(500).send({error: serverMessages.photos.error_to_search_photos}))            
     }
@@ -131,7 +142,7 @@ class PhotosController{
                 const filename = helper.saveImageOnServer(image, date)
                 const filePath = `http://localhost:4000/static/${filename.slice(7, filename.length)}`
 
-                await database_connection.insert({imageUrl: filePath, approved: 0}).table('photos')
+                await dbConnection.insert({imageUrl: filePath, approved: 0}).table('photos')
 
                 if(imagesBase64.length - 1 === index){
                     let message = imagesBase64.length > 1 ? serverMessages.photos.success_photos_received : serverMessages.photos.success_photo_received
@@ -159,7 +170,7 @@ class PhotosController{
         if(user){
             const { englishDescription, portugueseDescription, imageName } = request.body
 
-            database_connection.where({id: id}).update({englishDescription, portugueseDescription, imageName}).table('photos')
+            dbConnection.where({id: id}).update({englishDescription, portugueseDescription, imageName}).table('photos')
                 .then(updatedPhoto => response.status(200).send({message: serverMessages.photos.success_photo_was_updated}))
                 .catch(() => response.status(500).send({error: serverMessages.photos.error_to_update_photo}))
         }else
@@ -179,7 +190,7 @@ class PhotosController{
         }
 
         if(user){
-            database_connection.where({id: id}).update({approved: 1}).table('photos')
+            dbConnection.where({id: id}).update({approved: 1}).table('photos')
                 .then((updatedPhoto) => response.status(200).send({message: serverMessages.photos.success_photo_was_approved}))
                 .catch(() => response.status(500).send({error: serverMessages.photos.error_to_approve_photo}))
         }else
@@ -199,7 +210,7 @@ class PhotosController{
         }
 
         if(user){
-            database_connection.where({id: id}).update({approved: 0}).table('photos')
+            dbConnection.where({id: id}).update({approved: 0}).table('photos')
                 .then(updatedPhoto => response.status(200).send({message: serverMessages.photos.success_photo_was_disapproved}))
                 .catch(() => response.status(500).send({error: serverMessages.photos.error_to_disapprove_photo}))
         }else
@@ -221,8 +232,8 @@ class PhotosController{
 
         if(user){
             try {
-                const highlightImages = await database_connection.select('*').table('photos').where({highlightImage: 1});
-                const selectedImage = await database_connection.select('*').table('photos').where({id: id});
+                const highlightImages = await dbConnection.select('*').table('photos').where({highlightImage: 1});
+                const selectedImage = await dbConnection.select('*').table('photos').where({id: id});
                 
                 const maximumOfHighlightPhotos = (highlightImages.length >= 10);
                 const isADisapprovedPhoto = (selectedImage[0]?.approved === 0)
@@ -236,7 +247,7 @@ class PhotosController{
                     return
                 }
 
-                database_connection.where({id: id}).where({approved: 1}).update({highlightImage: 1}).table('photos')
+                dbConnection.where({id: id}).where({approved: 1}).update({highlightImage: 1}).table('photos')
                     .then(updatedPhoto => response.status(200).send({message: serverMessages.photos.success_photo_was_highlighted}))
             }catch{
                 response.status(500).send({error: serverMessages.photos.error_to_higilight_photo})
@@ -258,7 +269,7 @@ class PhotosController{
         }
         
         if(user){
-            database_connection.where({id: id}).update({highlightImage: 0}).table('photos')
+            dbConnection.where({id: id}).update({highlightImage: 0}).table('photos')
                 .then(updatedPhoto => response.status(200).send({message: serverMessages.photos.success_photo_was_unhighlighted}))
                 .catch(() => response.status(500).send({error: serverMessages.photos.error_to_unhigilight_photo}))
         }else
@@ -279,7 +290,7 @@ class PhotosController{
         }
 
         if(user){
-            database_connection.where({id: id}).del().table('photos')
+            dbConnection.where({id: id}).del().table('photos')
                 .then(data => response.status(200).send({message: serverMessages.photos.success_photo_deleted}))
                 .catch(() => response.status(500).send({error: serverMessages.photos.error_to_delete_photo}))
         }else
