@@ -20,7 +20,7 @@ class PhotosController{
                         totalElements: total?.count,
                         pageSize: pageSize,
                         page: pageNumber,
-                        totalPages: Math.round(total?.count / pageSize),
+                        totalPages: Math.ceil(total?.count / pageSize),
                         results: rows,
                     }
                     response.status(200).send(data)
@@ -44,7 +44,7 @@ class PhotosController{
                     totalElements: total?.count,
                     pageSize: pageSize,
                     page: pageNumber,
-                    totalPages: Math.round(total?.count / pageSize),
+                    totalPages: Math.ceil(total?.count / pageSize),
                     results: rows,
                 }
                 response.status(200).send(data)
@@ -74,7 +74,7 @@ class PhotosController{
                         totalElements: total?.count,
                         pageSize: pageSize,
                         page: pageNumber,
-                        totalPages: Math.round(total?.count / pageSize),
+                        totalPages: Math.ceil(total?.count / pageSize),
                         results: rows,
                     }
                     response.status(200).send(data)
